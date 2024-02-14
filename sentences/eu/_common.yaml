@@ -1,12 +1,31 @@
 language: eu
 responses:
   errors:
+    # General errors
     no_intent: "Barkatu, ez dizut ulertu"
+    handle_error: "Espero ez zen errore bat gertatu da agindua prozesatzean"
+
+    # Errors for when user is not logged
     no_area: "Ez dago {{ area }} izeneko gunerik"
+    no_domain: "Ez dago {{ domain }} bezelako elementurik"
     no_domain_in_area: "{{ area }} guneak ez dauka {{ domain }} moduko elementurik"
+    no_device_class: "Ez dut {{ device_class}} motako elementurik ezagutzen"
     no_device_class_in_area: "Ez dago {{ device_class }} motako elementurik {{ area }} gunean"
     no_entity: "Ez da {{ entity }} izeneko gailu edo entitaterik existitzen"
-    handle_error: "Espero ez zen errore bat gertatu da agindua prozesatzean"
+    no_entity_in_area: "Ez dago {{ entity }} deituriko elementurik {{ area }} gunean"
+
+ # Errors for when user is logged in and we can give more information
+    no_entity_exposed: "{{ entity }} elementuea ez dago ikusgai laguntzailearentzat"
+    no_entity_in_area_exposed: "{{ area }}ko {{ entity }} elementua ez dago ikusgai laguntzailearentzat"
+    no_domain_exposed: "Laguntzaileari ez zaio {{ domain }} motako elementurik erakusten"
+    no_domain_in_area_exposed: "Laguntzaileari ez zaio {{ domain }} motako elementurik erakusten {{ area }}n"
+    no_device_class_exposed: "{{ device_class }} motako elementuak ez zaizkio erakusten laguntzaileari"
+    no_device_class_in_area_exposed: "Ez zaio laguntzaileari {{device_class}} motako elementurik azaltzen {{area}}n"
+
+    # Used when multiple (exposed) devices have the same name
+    duplicate_entities: "{{ entity }} deituriko gailu bat baino gehiago dago"
+    duplicate_entities_in_area: "{{ entity }} deituriko gailu bat baino gehiago dago {{ area }} eremuan"
+    
 lists:
   color:
     values:
@@ -20,7 +39,7 @@ lists:
         out: "orange"
       - in: "horia"
         out: "yellow"
-      - in: "berdea"
+      - in: "(berdea|orlegia)"
         out: "green"
       - in: "urdina"
         out: "blue"
@@ -28,6 +47,8 @@ lists:
         out: "purple"
       - in: "marroia"
         out: "brown"
+      - in: "arrosa"
+        out: "pink"
   brightness:
     range:
       type: "percentage"
@@ -56,9 +77,9 @@ lists:
         out: 1
   on_off_states:
     values:
-      - in: "piztu"
+      - in: "(piztu)"
         out: "on"
-      - in: "itzali"
+      - in: "(itzali)"
         out: "off"
   on_off_domains:
     values:
@@ -68,11 +89,245 @@ lists:
         out: fan
       - in: etengailu(a)[k]
         out: switch
+  cover_states:
+    values:
+      - in: "ireki(ta|ak|rik)"
+        out: "open"
+      - in: "itxi(ta|rik|ak)"
+        out: "closed"
+      - in: "irekitzen"
+        out: "opening"
+      - in: "ixten"
+        out: "closing"
+  cover_classes:
+    value:
+      - in: "toldo(a|ak)"
+        out: awning
+      - in: "pertsiana(k)"
+        out: "blind"
+      - in: "kortina(k)"
+        out: "curtain"
+      - in: "ate(a|ak)
+        out: door
+      - in: "garajeko atea"
+        out: garage
+      - in: "(langa|hesia)
+        out: gate
+      - in: "estore(a|ak)
+        out: shade
+      - in: "leiho-ate(a|ak)
+        out: shutter
+      - in: "leiho(a|ak)
+        out: window
+  lock_states:
+    values:
+      - in: "giltza(z|rekin) itxi(ta|rik)"
+        out: locked
+      - in: "ireki(a|ta|rik)"
+        out: unlocked
+
+        
+  # binary_sensor
+  bs_battery_states:
+    values:
+      - in: "baju"
+        out: "on"
+      - in: "(normal|kargatzen)"
+        out: "off"
+
+  bs_battery_charging_states:
+    values:
+      - in: "kargatzen"
+        out: "on"
+      - in: "ez kargatzen"
+        out: "off"
+
+  bs_carbon_monoxide_states:
+    values:
+      - in: "deketatua"
+        out: "on"
+      - in: "ez deketkatua"
+        out: "off"
+
+  bs_cold_states:
+    values:
+      - in: "hotz(a)"
+        out: "on"
+      - in: "(normal|ongi|epel)"
+        out: "off"
+
+  bs_connectivity_states:
+    values:
+      - in: "konektatu(a|rik|ak|ta)"
+        out: "on"
+      - in: "(deskonektatu(rik|ta|ak)"
+        out: "off"
+
+  bs_door_states:
+    values:
+      - in: "ireki(a|ak)"
+        out: "on"
+      - in: "itxi(a|ak)"
+        out: "off"
+
+  bs_garage_door_states:
+    values:
+      - in: "ireki(a|ak)"
+        out: "on"
+      - in: "itxi(a|ak)"
+        out: "off"
+
+  bs_gas_states:
+    values:
+      - in: "(detectad|activ[ad])(o|a)[s]"
+        out: "on"
+      - in: "(despejad|no detectad|(no |in|des)activ[ad])(o|a)[s]"
+        out: "off"
+
+  bs_heat_states:
+    values:
+      - in: "bero"
+        out: "on"
+      - in: "epel"
+        out: "off"
+
+  bs_light_states:
+    values:
+      - in: "(activ[ad]|encendid|detectad)(o|a)[s]"
+        out: "on"
+      - in: "(((no |in|des)activ[ad]|apagad)(o|a)[s]|sin luz)"
+        out: "off"
+
+  bs_lock_states:
+    values:
+      - in: "abiert(o|a)[s]"
+        out: "on"
+      - in: "cerrad(o|a)[s] [con (llave|cerrojo|pestillo|cerradura)]"
+        out: "off"
+
+  bs_moisture_states:
+    values:
+      - in: "(húmed|mojad|inundad|activ[ad])(o|a)[s]"
+        out: "on"
+      - in: "(sec|(no |in|des)activad[ad])(o|a)[s]"
+        out: "off"
+
+  bs_motion_states:
+    values:
+      - in: "(activ[ad]|detectad)(o|a)[s]"
+        out: "on"
+      - in: "((no |in|des)activ[ad]|despejad)(o|a)[s]"
+        out: "off"
+
+  bs_occupancy_states:
+    values:
+      - in: "(detectad|activ[ad]|ocupad)(o|a)[s]"
+        out: "on"
+      - in: "((no |in|des)activ[ad]|despejad)(o|a)[s]"
+        out: "off"
+
+  bs_opening_states:
+    values:
+      - in: "abiert(o|a)[s]"
+        out: "on"
+      - in: "cerrad(o|a)[s]"
+        out: "off"
+
+  bs_plug_states:
+    values:
+      - in: "enchufad(o|a)[s]"
+        out: "on"
+      - in: "desenchufad(o|a)[s]"
+        out: "off"
+
+  bs_power_states:
+    values:
+      - in: "(alimentad|conectad|encendid|activ[ad])(o|a)[s]"
+        out: "on"
+      - in: "(desconectad|apagad|(no |in|des)activ[ad])(o|a)[s]"
+        out: "off"
+
+  bs_presence_states:
+    values:
+      - in: "(en casa|presente)"
+        out: "on"
+      - in: "(fuera|no presente)"
+        out: "off"
+
+  bs_problem_states:
+    values:
+      - in: "detectad(o|a)[s]"
+        out: "on"
+      - in: "correcto|ok"
+        out: "off"
+
+  bs_running_states:
+    values:
+      - in: "(ejecutándose|en ejecución|en marcha|funcionando)"
+        out: "on"
+      - in: "(no ejecutándose|(parad|detenid)(o|a)[s])"
+        out: "off"
+
+  bs_safety_states:
+    values:
+      - in: "insegur(o|a)[s]"
+        out: "on"
+      - in: "segur(o|a)[s]"
+        out: "off"
+
+  bs_smoke_states:
+    values:
+      - in: "(activ[ad]|detectad)(o|a)[s]"
+        out: "on"
+      - in: "((no |in|des)activ[ad]|despejad)(o|a)[s]"
+        out: "off"
+
+  bs_sound_states:
+    values:
+      - in: "(activ[ad]|detectad|disparad)(o|a)[s]"
+        out: "on"
+      - in: "((no |in|des)activ[ad]|despejad)(o|a)[s]"
+        out: "off"
+
+  bs_tamper_states:
+    values:
+      - in: "(detectad|manipulad)(o|a)[s]"
+        out: "on"
+      - in: "despejad(o|a)[s]"
+        out: "off"
+
+  bs_update_states:
+    values:
+      - in: "actualizable[s]|con actualización disponible"
+        out: "on"
+      - in: "actualizad(o|a)[s]"
+        out: "off"
+
+  bs_vibration_states:
+    values:
+      - in: "(activ[ad]|detectad)(o|a)[s]|vibrando"
+        out: "on"
+      - in: "((no |in|des)activ[ad]|despejad)(o|a)[s]"
+        out: "off"
+
+  bs_window_states:
+    values:
+      - in: "abiert(o|a)[s]"
+        out: "on"
+      - in: "cerrad(o|a)[s]"
+        out: "closed"
+
+  shopping_list_item:
+    wildcard: true
+
+  zone:
+    wildcard: true
+  
 expansion_rules:
   name: "{name}[n]"
   area: "{area}[n]"
-  piztu: "(piztu|aktibatu|gaitu)"
-  itzali: "(itzali|desaktibatu|ezgaitu)"
+  piztu: "(piztu|aktibatu|gaitu|konektatu)"
+  itzali: "(itzali|desaktibatu|ezgaitu|deskonektatu|amatatu)"
 skip_words:
   - "mesedez"
   - "eskerrik asko"
